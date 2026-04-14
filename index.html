@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>餐厅菜单</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .header {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+        }
+
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+            padding: 8px 12px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cart-icon:hover {
+            background-color: #e0e0e0;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background-color: #ff6b6b;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cart-panel {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            width: 320px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+        }
+
+        .cart-panel.open {
+            display: block;
+        }
+
+        .cart-header {
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-clear {
+            color: #999;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .cart-clear:hover {
+            color: #ff6b6b;
+        }
+
+        .cart-empty {
+            padding: 40px 16px;
+            text-align: center;
+            color: #999;
+        }
+
+        .cart-empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .cart-items {
+            padding: 8px 0;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            gap: 12px;
+        }
+
+        .cart-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .cart-item-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            background-color: #eee;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .cart-item-price {
+            font-size: 13px;
+            color: #ff6b6b;
+        }
+
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .qty-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 6px;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qty-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .qty-btn.minus:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .cart-item-qty {
+            font-size: 14px;
+            font-weight: 500;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .cart-footer {
+            padding: 16px;
+            border-top: 1px solid #eee;
+            background-color: #fafafa;
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .cart-total-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .cart-total-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ff6b6b;
+        }
+
+        .cart-total-price::before {
+            content: '¥';
+            font-size: 14px;
+        }
+
+        .cart-checkout {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: #ff6b6b;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .cart-checkout:hover {
+            background-color: #ff5252;
+        }
+
+        .cart-checkout:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .categories {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .category-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .category-btn.active {
+            background-color: #ff6b6b;
+            color: #fff;
+        }
+
+        .menu-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .category-title {
+            font-size: 20px;
+            margin: 24px 0 16px;
+            padding-left: 8px;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .menu-item {
+            background-color: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        .menu-item-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background-color: #eee;
+        }
+
+        .menu-item-content {
+            padding: 16px;
+        }
+
+        .menu-item-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .menu-item-description {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .menu-item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-item-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ff6b6b;
+        }
+
+        .menu-item-price::before {
+            content: '¥';
+            font-size: 14px;
+            margin-right: 2px;
+        }
+
+        .add-to-cart-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background-color: #ff6b6b;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: #ff5252;
+        }
+
+        .add-to-cart-btn.added {
+            background-color: #4caf50;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="header-top">
+                <h1>餐厅菜单</h1>
+                <div class="cart-icon" id="cartIcon">
+                    <span>🛒</span>
+                    <span>购物车</span>
+                    <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
+                    <div class="cart-panel" id="cartPanel">
+                        <div class="cart-header">
+                            <span>购物车</span>
+                            <span class="cart-clear" id="cartClear">清空</span>
+                        </div>
+                        <div class="cart-empty" id="cartEmpty">
+                            <div class="cart-empty-icon">🛒</div>
+                            <div>购物车是空的</div>
+                        </div>
+                        <div class="cart-items" id="cartItems"></div>
+                        <div class="cart-footer" id="cartFooter" style="display: none;">
+                            <div class="cart-total">
+                                <span class="cart-total-label">合计</span>
+                                <span class="cart-total-price" id="cartTotalPrice">0</span>
+                            </div>
+                            <button class="cart-checkout">去结算</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="categories">
+                <button class="category-btn active" data-category="all">全部</button>
+                <button class="category-btn" data-category="main">主食</button>
+                <button class="category-btn" data-category="snack">小吃</button>
+                <button class="category-btn" data-category="drink">饮品</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="menu-container">
+        <section class="menu-section" data-category="main">
+            <h2 class="category-title">主食</h2>
+            <div class="menu-grid">
+                <article class="menu-item" data-id="1" data-name="红烧牛肉面" data-price="38" data-image="https://placehold.co/400x300?text=红烧牛肉面">
+                    <img class="menu-item-image" src="https://placehold.co/400x300?text=红烧牛肉面" alt="红烧牛肉面">
+                    <div class="menu-item-content">
+                        <h3 class="menu-item-name">红烧牛肉面</h3>
+                        <p class="menu-item-description">精选牛腩，慢炖入味，配上手擀面条</p>
+                        <div class="menu-item-footer">
+                            <span class="menu-item-price">38</span>
+                            <button class="add-to-cart-btn">加入购物车</button>
+                        </div>
+                    </div>
+                </article>
+                <article class="menu-item" data-id="2" data-name="扬州炒饭" data-price="28" data-image="https://placehold.co/400x300?text=扬州炒饭">
+                    <img class="menu-item-image" src="https://placehold.co/400x300?text=扬州炒饭" alt="扬州炒饭">
+                    <div class="menu-item-content">
+                        <h3 class="menu-item-name">扬州炒饭</h3>
+                        <p class="menu-item-description">粒粒分明，配以虾仁、火腿、青豆</p>
+                        <div class="menu-item-footer">
+                            <span class="menu-item-price">28</span>
+                            <button class="add-to-cart-btn">加入购物车</button>
+                        </div>
+                    </div>
+                </article>
+                <article class="menu-item" data-id="3" data-name="番茄鸡蛋面" data-price="22" data-image="https://placehold.co/400x300?text=番茄鸡蛋面">
+                    <img class="menu-item-image" src="https://placehold.co/400x300?text=番茄鸡蛋面" alt="番茄鸡蛋面">
+                    <div class="menu-item-content">
+                        <h3 class="menu-item-name">番茄鸡蛋面</h3>
+                        <p class="menu-item-description">酸甜可口，营养丰富</p>
+                        <div class="menu-item-footer">
+                            <span class="menu-item-price">22</span>
+                            <button class="add-to-cart-btn">加入购物车</button>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="menu-section" data-category="snack">
+            <h2 class="category-title">小吃</h2>
+            <div class="menu-grid">
+                <article class="menu-item" data-id="4" data-name="炸鸡翅" data-price="18" data-image="https://placehold.co/400x300?text=炸鸡翅">
+                    <img class="menu-item-image" src="https://placehold.co/400x300?text=炸鸡翅" alt="炸鸡翅">
+                    <div class="menu-item-content">
+                        <h3 class="menu-item-name">炸鸡翅</h3>
+                        <p class="menu-item-description">外酥里嫩，香辣可口</p>
+                        <div class="menu-item-footer">
+                            <span class="menu-item-price">18</span>
+                            <button class="add-to-cart-btn">加入购物车</button>
+                        </div>
+                    </div>
+                </article>
+                <article class="menu-item" data-id="5" data-name="薯条" data-price="12" data-image="https://placehold.co/400x300?text=薯条">
+                    <img class="menu-item-image" src="https://placehold.co/400x300?text=薯条" alt="薯条">
+                    <div class="menu-item-content">
+                        <h3 class="menu-item-name">薯条</h3>
+                        <p class="menu-item-description">金黄酥脆，搭配番茄酱</p>
+                        <div class="menu-item-footer">
+                            <span class="menu-item-price">12</span>
+                            <button class="add-to-cart-btn">加入购物车</button>
+                        </div>
+                    </div>
+                </article>
+                <article class="menu-item" data-id="6" data-name="春卷" data-price="15" data-image="https://placehold.co/400x300?text=春卷">
+                    <img class="menu-item-image" src="https://placehold.co/400x300?text=春卷" alt="春卷">
+                    <div class="menu-item-content">
+                        <h3 class="menu-item-name">春卷</h3>
+                        <p class="menu-item-description">皮脆馅香，蘸酱食用</p>
+                        <div class="menu-item-footer">
+                            <span class="menu-item-price">15</span>
+                            <button class="add-to-cart-btn">加入购物车</button>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="menu-section" data-category="drink">
+            <h2 class="category-title">饮品</h2>
+            <div class="menu-grid">
+                <article class="menu-item" data-id="7" data-name="柠檬水" data-price="8" data-image="https://placehold.co/400x300?text=柠檬水">
+                    <img class="menu-item-image" src="https://placehold.co/400x300?text=柠檬水" alt="柠檬水">
+                    <div class="menu-item-content">
+                        <h3 class="menu-item-name">柠檬水</h3>
+                        <p class="menu-item-description">新鲜柠檬，清爽解腻</p>
+                        <div class="menu-item-footer">
+                            <span class="menu-item-price">8</span>
+                            <button class="add-to-cart-btn">加入购物车</button>
+                        </div>
+                    </div>
+                </article>
+                <article class="menu-item" data-id="8" data-name="珍珠奶茶" data-price="16" data-image="https://placehold.co/400x300?text=珍珠奶茶">
+                    <img class="menu-item-image" src="https://placehold.co/400x300?text=珍珠奶茶" alt="珍珠奶茶">
+                    <div class="menu-item-content">
+                        <h3 class="menu-item-name">珍珠奶茶</h3>
+                        <p class="menu-item-description">丝滑奶茶，Q弹珍珠</p>
+                        <div class="menu-item-footer">
+                            <span class="menu-item-price">16</span>
+                            <button class="add-to-cart-btn">加入购物车</button>
+                        </div>
+                    </div>
+                </article>
+                <article class="menu-item" data-id="9" data-name="鲜榨果汁" data-price="14" data-image="https://placehold.co/400x300?text=鲜榨果汁">
+                    <img class="menu-item-image" src="https://placehold.co/400x300?text=鲜榨果汁" alt="鲜榨果汁">
+                    <div class="menu-item-content">
+                        <h3 class="menu-item-name">鲜榨果汁</h3>
+                        <p class="menu-item-description">时令水果，现榨更鲜</p>
+                        <div class="menu-item-footer">
+                            <span class="menu-item-price">14</span>
+                            <button class="add-to-cart-btn">加入购物车</button>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Cart state
+        let cart = [];
+
+        // DOM elements
+        const cartIcon = document.getElementById('cartIcon');
+        const cartPanel = document.getElementById('cartPanel');
+        const cartBadge = document.getElementById('cartBadge');
+        const cartItems = document.getElementById('cartItems');
+        const cartEmpty = document.getElementById('cartEmpty');
+        const cartFooter = document.getElementById('cartFooter');
+        const cartTotalPrice = document.getElementById('cartTotalPrice');
+        const cartClear = document.getElementById('cartClear');
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        const menuSections = document.querySelectorAll('.menu-section');
+        const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+
+        // Toggle cart panel
+        cartIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            cartPanel.classList.toggle('open');
+        });
+
+        // Close cart panel when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!cartPanel.contains(e.target) && !cartIcon.contains(e.target)) {
+                cartPanel.classList.remove('open');
+            }
+        });
+
+        // Category filtering
+        categoryButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                categoryButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const category = btn.dataset.category;
+
+                menuSections.forEach(section => {
+                    if (category === 'all' || section.dataset.category === category) {
+                        section.classList.remove('hidden');
+                    } else {
+                        section.classList.add('hidden');
+                    }
+                });
+            });
+        });
+
+        // Add to cart
+        function addToCart(item) {
+            const existingItem = cart.find(c => c.id === item.id);
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({ ...item, quantity: 1 });
+            }
+            updateCartUI();
+        }
+
+        // Update item quantity in cart
+        function updateItemQuantity(id, delta) {
+            const item = cart.find(c => c.id === id);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity <= 0) {
+                    cart = cart.filter(c => c.id !== id);
+                }
+            }
+            updateCartUI();
+        }
+
+        // Clear cart
+        function clearCart() {
+            cart = [];
+            updateCartUI();
+        }
+
+        // Update cart UI
+        function updateCartUI() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+            // Update badge
+            if (totalItems > 0) {
+                cartBadge.style.display = 'flex';
+                cartBadge.textContent = totalItems;
+            } else {
+                cartBadge.style.display = 'none';
+            }
+
+            // Update cart items
+            if (cart.length === 0) {
+                cartEmpty.style.display = 'block';
+                cartFooter.style.display = 'none';
+                cartItems.innerHTML = '';
+            } else {
+                cartEmpty.style.display = 'none';
+                cartFooter.style.display = 'block';
+                cartItems.innerHTML = cart.map(item => `
+                    <div class="cart-item">
+                        <img class="cart-item-image" src="${item.image}" alt="${item.name}">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">¥${item.price}</div>
+                        </div>
+                        <div class="cart-item-controls">
+                            <button class="qty-btn minus" data-id="${item.id}" ${item.quantity <= 1 ? 'disabled' : ''}>−</button>
+                            <span class="cart-item-qty">${item.quantity}</span>
+                            <button class="qty-btn plus" data-id="${item.id}">+</button>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Add event listeners to quantity buttons
+                document.querySelectorAll('.qty-btn.minus').forEach(btn => {
+                    btn.addEventListener('click', () => updateItemQuantity(parseInt(btn.dataset.id), -1));
+                });
+                document.querySelectorAll('.qty-btn.plus').forEach(btn => {
+                    btn.addEventListener('click', () => updateItemQuantity(parseInt(btn.dataset.id), 1));
+                });
+            }
+
+            // Update total price
+            cartTotalPrice.textContent = totalPrice;
+
+            // Update button states for items in cart
+            addToCartButtons.forEach(btn => {
+                const menuItem = btn.closest('.menu-item');
+                const itemId = parseInt(menuItem.dataset.id);
+                const inCart = cart.find(c => c.id === itemId);
+                if (inCart) {
+                    btn.classList.add('added');
+                    btn.textContent = `已加入 (${inCart.quantity})`;
+                } else {
+                    btn.classList.remove('added');
+                    btn.textContent = '加入购物车';
+                }
+            });
+        }
+
+        // Add click handlers to add-to-cart buttons
+        addToCartButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const menuItem = btn.closest('.menu-item');
+                const item = {
+                    id: parseInt(menuItem.dataset.id),
+                    name: menuItem.dataset.name,
+                    price: parseInt(menuItem.dataset.price),
+                    image: menuItem.dataset.image
+                };
+                addToCart(item);
+            });
+        });
+
+        // Clear cart button
+        cartClear.addEventListener('click', clearCart);
+
+        // Initial UI update
+        updateCartUI();
+    </script>
+</body>
+</html>
