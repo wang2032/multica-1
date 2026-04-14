@@ -3,31 +3,313 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>旅行计划详情</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>课程详情 - 课程报名</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .course-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .course-image {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .course-title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .course-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .course-info {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .info-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+        .info-value {
+            font-size: 16px;
+            color: #333;
+            font-weight: 600;
+        }
+        .enroll-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .enroll-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .enroll-btn:active {
+            transform: translateY(0);
+        }
+        .enroll-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .enroll-btn.enrolled {
+            background: #52c41a;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .modal-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        .modal-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .modal-btn.primary {
+            background: #667eea;
+            color: white;
+        }
+        .modal-btn.secondary {
+            background: #f0f0f0;
+            color: #666;
+        }
+        .success-message {
+            display: none;
+            padding: 20px;
+            background: #f6ffed;
+            border: 1px solid #b7eb8f;
+            border-radius: 8px;
+            margin-top: 20px;
+            color: #52c41a;
+        }
+        .success-message.active {
+            display: block;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <header class="trip-header">
-            <h1>旅行计划详情</h1>
-            <p class="trip-date">2026年5月1日 - 2026年5月5日</p>
-        </header>
-
-        <main>
-            <section class="trip-overview">
-                <h2>行程概览</h2>
-                <p>北京5日深度游，体验首都的历史与现代魅力。</p>
-            </section>
-
-            <section class="attraction-recommendation">
-                <h2>景点推荐</h2>
-                <div class="attraction-list" id="attractionList">
-                    <!-- Attraction cards will be inserted here -->
+        <div class="course-card">
+            <div class="course-image">📚</div>
+            <h1 class="course-title" id="courseTitle">加载中...</h1>
+            <p class="course-description" id="courseDescription">加载中...</p>
+            <div class="course-info">
+                <div class="info-item">
+                    <span class="info-label">课程价格</span>
+                    <span class="info-value" id="coursePrice">¥0</span>
                 </div>
-            </section>
-        </main>
+                <div class="info-item">
+                    <span class="info-label">课程时长</span>
+                    <span class="info-value" id="courseDuration">0小时</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">报名人数</span>
+                    <span class="info-value" id="courseStudents">0人</span>
+                </div>
+            </div>
+            <button class="enroll-btn" id="enrollBtn" onclick="openEnrollModal()">报名课程</button>
+            <div class="success-message" id="successMessage">
+                ✅ 报名成功！欢迎加入课程学习。
+            </div>
+        </div>
     </div>
 
-    <script src="script.js"></script>
+    <div class="modal" id="enrollModal">
+        <div class="modal-content">
+            <h2 class="modal-title">填写报名信息</h2>
+            <input type="text" class="modal-input" id="userName" placeholder="请输入您的姓名">
+            <input type="tel" class="modal-input" id="userPhone" placeholder="请输入您的手机号">
+            <input type="email" class="modal-input" id="userEmail" placeholder="请输入您的邮箱（可选）">
+            <button class="modal-btn primary" onclick="submitEnrollment()">确认报名</button>
+            <button class="modal-btn secondary" onclick="closeEnrollModal()">取消</button>
+        </div>
+    </div>
+
+    <script>
+        // 课程数据
+        const courseData = {
+            id: 'course-001',
+            title: 'Python 编程基础',
+            description: '本课程将带您从零开始学习 Python 编程。课程内容涵盖 Python 基本语法、数据类型、控制结构、函数、面向对象编程等核心知识。通过大量实践案例，帮助您快速掌握 Python 编程技能，为后续学习数据分析、人工智能等方向打下坚实基础。',
+            price: 299,
+            duration: 48,
+            students: 128
+        };
+
+        // 报名状态
+        let isEnrolled = false;
+
+        // 初始化页面
+        function initPage() {
+            document.getElementById('courseTitle').textContent = courseData.title;
+            document.getElementById('courseDescription').textContent = courseData.description;
+            document.getElementById('coursePrice').textContent = '¥' + courseData.price;
+            document.getElementById('courseDuration').textContent = courseData.duration + '小时';
+            document.getElementById('courseStudents').textContent = courseData.students + '人';
+        }
+
+        // 打开报名弹窗
+        function openEnrollModal() {
+            if (isEnrolled) return;
+            document.getElementById('enrollModal').classList.add('active');
+            document.getElementById('userName').value = '';
+            document.getElementById('userPhone').value = '';
+            document.getElementById('userEmail').value = '';
+        }
+
+        // 关闭报名弹窗
+        function closeEnrollModal() {
+            document.getElementById('enrollModal').classList.remove('active');
+        }
+
+        // 提交报名
+        function submitEnrollment() {
+            const name = document.getElementById('userName').value.trim();
+            const phone = document.getElementById('userPhone').value.trim();
+
+            if (!name) {
+                alert('请输入您的姓名');
+                return;
+            }
+
+            if (!phone) {
+                alert('请输入您的手机号');
+                return;
+            }
+
+            if (!/^1[3-9]\d{9}$/.test(phone)) {
+                alert('请输入有效的手机号');
+                return;
+            }
+
+            // 模拟报名成功
+            isEnrolled = true;
+            courseData.students++;
+
+            document.getElementById('enrollModal').classList.remove('active');
+            document.getElementById('enrollBtn').textContent = '已报名';
+            document.getElementById('enrollBtn').classList.add('enrolled');
+            document.getElementById('enrollBtn').disabled = true;
+            document.getElementById('courseStudents').textContent = courseData.students + '人';
+            document.getElementById('successMessage').classList.add('active');
+
+            // 保存报名信息到本地存储
+            saveEnrollment({
+                courseId: courseData.id,
+                name: name,
+                phone: phone,
+                email: document.getElementById('userEmail').value.trim(),
+                enrollTime: new Date().toISOString()
+            });
+        }
+
+        // 保存报名信息到本地存储
+        function saveEnrollment(data) {
+            const enrollments = JSON.parse(localStorage.getItem('enrollments') || '[]');
+            enrollments.push(data);
+            localStorage.setItem('enrollments', JSON.stringify(enrollments));
+        }
+
+        // 检查是否已报名
+        function checkEnrollmentStatus() {
+            const enrollments = JSON.parse(localStorage.getItem('enrollments') || '[]');
+            const existing = enrollments.find(e => e.courseId === courseData.id);
+            if (existing) {
+                isEnrolled = true;
+                document.getElementById('enrollBtn').textContent = '已报名';
+                document.getElementById('enrollBtn').classList.add('enrolled');
+                document.getElementById('enrollBtn').disabled = true;
+                document.getElementById('successMessage').classList.add('active');
+            }
+        }
+
+        // 点击弹窗背景关闭
+        document.getElementById('enrollModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEnrollModal();
+            }
+        });
+
+        // 页面加载完成后初始化
+        initPage();
+        checkEnrollmentStatus();
+    </script>
 </body>
 </html>
