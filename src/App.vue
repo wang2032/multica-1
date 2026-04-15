@@ -10,7 +10,9 @@
         <router-link to="/finance">概览</router-link>
         <router-link to="/finance/transactions">交易</router-link>
         <router-link to="/finance/accounts">账户</router-link>
+        <router-link to="/finance/budget">预算</router-link>
         <router-link to="/finance/reports">报表</router-link>
+        <router-link to="/finance/statistics">统计</router-link>
         <router-link to="/about">关于</router-link>
       </div>
     </nav>

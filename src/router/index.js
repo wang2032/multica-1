@@ -5,6 +5,8 @@ import Dashboard from '../views/finance/Dashboard.vue'
 import Transactions from '../views/finance/Transactions.vue'
 import Accounts from '../views/finance/Accounts.vue'
 import Reports from '../views/finance/Reports.vue'
+import Budget from '../views/finance/Budget.vue'
+import Statistics from '../views/finance/Statistics.vue'
 
 const routes = [
   {
@@ -36,6 +38,16 @@ const routes = [
     path: '/finance/reports',
     name: 'Reports',
     component: Reports
+  },
+  {
+    path: '/finance/budget',
+    name: 'Budget',
+    component: Budget
+  },
+  {
+    path: '/finance/statistics',
+    name: 'Statistics',
+    component: Statistics
   }
 ]
 
