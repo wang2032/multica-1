@@ -2,6 +2,10 @@ import httpx
 from datetime import datetime
 from sqlalchemy import select
 import os
+from dotenv import load_dotenv
+
+# Load .env file if it exists
+load_dotenv()
 
 from database import async_session
 from models import Topic, Article
