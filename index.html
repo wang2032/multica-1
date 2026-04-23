@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>菜单展示</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>菜单展示</h1>
+            <p class="subtitle">浏览全部菜品</p>
+        </header>
+
+        <nav class="category-nav">
+            <button class="category-btn active" data-category="all">全部</button>
+            <button class="category-btn" data-category="main">主菜</button>
+            <button class="category-btn" data-category="appetizer">开胃菜</button>
+            <button class="category-btn" data-category="dessert">甜点</button>
+            <button class="category-btn" data-category="drink">饮品</button>
+        </nav>
+
+        <main class="menu-grid" id="menuGrid">
+            <!-- Menu items will be inserted here by JavaScript -->
+        </main>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
